@@ -38,6 +38,45 @@ void print_path(vector<int> path) {
 	}
 }
 
+vector<int> find_min_cut_from_residual_network(vector< vector<int> > network, int s) {
+	vector<int> vertices_of_source_side;
+	int size = network.size();
+	vector<Vertex> list_of_vertices;
+
+	for (int i = 0; i < size; i++) {
+		Vertex new_vertex;
+		new_vertex.color = WHITE;
+		new_vertex.predecessor = -1;
+		list_of_vertices.push_back(new_vertex);
+	}
+
+	list_of_vertices[s].color = BLACK;
+
+	list<int> queue_of_vertices;
+	queue_of_vertices.push_back(s);
+
+	while (queue_of_vertices.size() != 0) {
+		int current_vertex = queue_of_vertices.front();
+		queue_of_vertices.pop_front();
+
+		for (int i = 0; i < size; i++) {
+			if (network[current_vertex][i] != 0 && list_of_vertices[i].color == WHITE) {
+				queue_of_vertices.push_back(i);
+				list_of_vertices[i].predecessor = current_vertex;
+				list_of_vertices[i].color = BLACK;
+			}
+		}
+	}
+
+	for (int i = 0; i < size; i++) {
+		if (list_of_vertices[i].color == BLACK) {
+			vertices_of_source_side.push_back(i);
+		}
+	}
+
+	return vertices_of_source_side;
+}
+
 vector< vector<int> > init_flow_network(int size) {
 	vector< vector<int> > residual_network;
 	for (int i = 0; i < size; i++) {
@@ -94,17 +133,13 @@ vector<int> find_path_in_network(vector< vector<int> > network, int s, int t) {
 	return path;
 }
 
-int max_flow_FF(vector< vector<int> > network, int s, int t) {
+int max_flow_FF(vector< vector<int> > network, vector< vector<int> > &residual_network, int s, int t) {
 	int size = network.size();
 	vector< vector<int> > flow_network = init_flow_network(size);
-	vector< vector<int> > residual_network(network);
 
 	vector<int> path = find_path_in_network(network, s, t);
 
 	while (path.size() != 0) {
-		cout<<"path";
-		print_path(path);
-		cout<<endl;
 		int augmenting_amount = INT_MAX;
 
 		for (int i = path.size() - 1; i >= 1; i--) {
@@ -122,11 +157,6 @@ int max_flow_FF(vector< vector<int> > network, int s, int t) {
 				}
 			}
 		}
-
-		cout<<"flow_network"<<endl;
-		print_graph(flow_network);
-		cout<<"residual_network"<<endl;
-		print_graph(residual_network);
 
 		path = find_path_in_network(residual_network, s, t);
 	}
@@ -157,9 +187,12 @@ int main(int argc, char const *argv[]) {
 
 			network.push_back(row);
 		}
-		print_graph(network);
-		cout<<max_flow_FF(network, 0, 5)<<endl;
-		// print_path(find_path_in_network(network, 0, 4));
+		vector< vector<int> > residual_network(network);
+		cout<<max_flow_FF(network, residual_network, 0, 5)<<endl;
+		vector<int> min_cut = find_min_cut_from_residual_network(residual_network, 0);
+		for (int i = 0; i < min_cut.size(); i++) {
+			cout<<min_cut[i]<<" ";
+		}
 	}
 	return 0;
 }
