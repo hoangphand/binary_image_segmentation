@@ -49,9 +49,8 @@ int cosine_similarity(Mat image, int pixel_a, int pixel_b) {
         (sqrt(pow(a[0], 2) + pow(a[1], 2) + pow(a[2], 2)) * \
         sqrt(pow(b[0], 2) + pow(b[1], 2) + pow(b[2], 2))) * 1000);
 
-    if (cosine_sim > 990) {
+    if (cosine_sim > 995) {
         return 2000;
-        // return INT_MAX / 2;
     } else {
         return 1;
     }
@@ -268,16 +267,6 @@ int main( int argc, char** argv )
 
     vector<int> initial_fore_set;
     vector<int> initial_back_set;
-
-    // int fore_1 = 180 * width + 380;
-    // int fore_2 = 280 * width + 380;
-    // int back_1 = 290 * width + 410;
-    // int back_2 = 170 * width + 410;
-
-    // cout<<"(fore_1, back_1): "<<cosine_similarity(in_image, fore_1, back_1)<<endl;
-    // cout<<"(fore_1, fore_2): "<<cosine_similarity(in_image, fore_1, fore_2)<<endl;
-    // cout<<"(back_1, fore_2): "<<cosine_similarity(in_image, back_1, fore_2)<<endl;
-    // cout<<"(back_1, back_2): "<<cosine_similarity(in_image, back_1, back_2)<<endl;
     
     // get the initil pixels
     for (int i = 0; i < n; i++) {
@@ -288,13 +277,11 @@ int main( int argc, char** argv )
 
         if (t == 1) {
             // fore
-            // circle(in_image, Point(x, y), 4, Scalar(255, 0, 0), 1, 8 );
-            circle(out_image, Point(x, y), 4, Scalar(255, 0, 0), 1, 8 );
+            // circle(out_image, Point(x, y), 4, Scalar(255, 0, 0), 1, 8 );
             initial_fore_set.push_back(y * width + x);
         } else {
             // back
-            // circle(in_image, Point(x, y), 4, Scalar(0, 0, 255), 1, 8 );
-            circle(out_image, Point(x, y), 4, Scalar(0, 0, 255), 1, 8 );
+            // circle(out_image, Point(x, y), 4, Scalar(0, 0, 255), 1, 8 );
             initial_back_set.push_back(y * width + x);
         }
     }
@@ -317,9 +304,6 @@ int main( int argc, char** argv )
                 new_edge.residual_capacity = similarity;
                 new_edge.flow = 0;
                 new_node.edges.push_back(new_edge);
-                // if (similarity != 1000) {
-                //     cout<<"1 similarity: "<<similarity<<", i: "<<i<<", j: "<<j<<endl;
-                // }
             }
 
             // right
@@ -332,9 +316,6 @@ int main( int argc, char** argv )
                 new_edge.residual_capacity = similarity;
                 new_edge.flow = 0;
                 new_node.edges.push_back(new_edge);
-                // if (similarity != 1000) {
-                //     cout<<"2 similarity: "<<similarity<<", i: "<<i<<", j: "<<j<<endl;
-                // }
             }
 
             // top
@@ -347,9 +328,6 @@ int main( int argc, char** argv )
                 new_edge.residual_capacity = similarity;
                 new_edge.flow = 0;
                 new_node.edges.push_back(new_edge);
-                // if (similarity != 1000) {
-                //     cout<<"3 similarity: "<<similarity<<", i: "<<i<<", j: "<<j<<endl;
-                // }
             }
 
             // bottom
@@ -362,25 +340,11 @@ int main( int argc, char** argv )
                 new_edge.residual_capacity = similarity;
                 new_edge.flow = 0;
                 new_node.edges.push_back(new_edge);
-                // if (similarity != 1000) {
-                //     cout<<"4 similarity: "<<similarity<<", i: "<<i<<", j: "<<j<<endl;
-                // }
             }
 
             network.push_back(new_node);
         }
     }
-
-    // MyNode virtual_source;
-    // virtual_source.label = network.size();
-    // Edge new_edge;
-    // new_edge.from = network.size();
-    // new_edge.to = initial_fore_set[0];
-    // new_edge.capacity = INT_MAX;
-    // new_edge.residual_capacity = INT_MAX;
-    // new_edge.flow = 0;
-    // virtual_source.edges.push_back(new_edge);
-    // network.push_back(virtual_source);
 
     MyNode virtual_source;
     virtual_source.label = network.size();
@@ -413,32 +377,16 @@ int main( int argc, char** argv )
         new_edge.flow = 0;
         network[initial_back_set[i]].edges.push_back(new_edge);
     }
-    // for (int i = 0; i < initial_back_set.size(); i++) {
-    //     Edge new_edge;
-    //     new_edge.from = network.size();
-    //     new_edge.to = initial_back_set[i];
-    //     new_edge.capacity = INT_MAX;
-    //     new_edge.residual_capacity = INT_MAX;
-    //     new_edge.flow = 0;
-    //     virtual_sink.edges.push_back(new_edge);
-    // }
+
     network.push_back(virtual_sink);
 
     cout<<max_flow_FF(out_image, network, network.size() - 2, network.size() - 1)<<endl;
-    // cout<<max_flow_FF(out_image, network, network.size() - 1, initial_back_set[0])<<endl;
-    // cout<<max_flow_FF(out_image, network, initial_fore_set[0], initial_back_set[0])<<endl;
-    // cout<<max_flow_FF(network, initial_fore_set[0], initial_back_set[0])<<endl;
-    // cout<<max_flow_FF(network, network.size() - 2, network.size() - 1)<<endl;
     vector<int> vertices_belong_to_source = find_min_cut(network, initial_fore_set[0]);
-    // print_path(vertices_belong_to_source);
     cout<<"size: "<<vertices_belong_to_source.size()<<endl;
-    // for (int i = 0; i < network[initial_fore_set[0]].edges.size(); i++) {
-    //     cout<<network[initial_fore_set[0]].edges[i].residual_capacity<<endl;
-    // }
 
-    for (int i = 0; i < vertices_belong_to_source.size(); i++) {
-        int x = int(vertices_belong_to_source[i] / 640);
-        int y = vertices_belong_to_source[i] % 640;
+    for (int i = 0; i < network.size() - 2; i++) {
+        int x = int(i / 640);
+        int y = i % 640;
         Vec3b pixel;
         pixel[0] = 255;
         pixel[1] = 0;
@@ -446,32 +394,24 @@ int main( int argc, char** argv )
         out_image.at<Vec3b>(x, y) = pixel;
     }
 
-    // for (int i = 0; i < width; i++) {
-    //     for (int j = 0; j < height; j++) {
-    //         // cout<<j<<" "<<i<<endl;
-    //         Vec3b cur_pixel = in_image.at<Vec3b>(j, i);
-
-    //         Vec3b pixel;
-    //         pixel[0] = 0;
-    //         pixel[1] = 0;
-    //         pixel[2] = 0;
-    //         if (fore_sim < back_sim) {
-    //             pixel[0] = 255;
-    //         } else {
-    //             pixel[2] = 255;
-    //         }
-    //         out_image.at<Vec3b>(j, i) = pixel;
-    //     }
-    // }
+    for (int i = 0; i < vertices_belong_to_source.size(); i++) {
+        int x = int(vertices_belong_to_source[i] / 640);
+        int y = vertices_belong_to_source[i] % 640;
+        Vec3b pixel;
+        pixel[0] = 0;
+        pixel[1] = 0;
+        pixel[2] = 255;
+        out_image.at<Vec3b>(x, y) = pixel;
+    }
     
     // write it on disk
     imwrite( argv[3], out_image);
     
     // also display them both
     
-    // namedWindow( "Original image", WINDOW_AUTOSIZE );
-    // namedWindow( "Show Marked Pixels", WINDOW_AUTOSIZE );
-    // imshow( "Original image", in_image );
+    namedWindow( "Original image", WINDOW_AUTOSIZE );
+    namedWindow( "Show Marked Pixels", WINDOW_AUTOSIZE );
+    imshow( "Original image", in_image );
     imshow( "Show Marked Pixels", out_image );
     waitKey(0);
     return 0;
