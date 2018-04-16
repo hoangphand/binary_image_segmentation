@@ -652,7 +652,7 @@ int main( int argc, char** argv )
     }
     
     // // write it on disk
-    // imwrite( argv[3], out_image);
+    imwrite( argv[3], out_image);
     
     // also display them both
     
