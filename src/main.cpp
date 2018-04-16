@@ -187,12 +187,12 @@ int max_flow_FF(Mat &in_image, vector<MyNode> &network, int s, int t, vector< ve
                 augmenting_amount = residual_capacity_of_edge;
             }
         }
-        for (int i = path.size() - 1; i >= 0; i--) {
-            pixel[0] = 0;
-            pixel[1] = 0;
-            pixel[2] = 0;
-            in_image.at<Vec3b>(int(path[i] / 640), path[i] % 640) = pixel;
-        }
+        // for (int i = path.size() - 1; i >= 0; i--) {
+        //     pixel[0] = 0;
+        //     pixel[1] = 0;
+        //     pixel[2] = 0;
+        //     in_image.at<Vec3b>(int(path[i] / 640), path[i] % 640) = pixel;
+        // }
         count++;
         // cout<<"count: "<<count<<endl;
         // cout<<"augmenting_amount: "<<augmenting_amount<<endl;
@@ -663,7 +663,7 @@ int main( int argc, char** argv )
     }
     
     // // // write it on disk
-    // imwrite( argv[3], out_image);
+    imwrite( argv[3], out_image);
     
     // also display them both
     
