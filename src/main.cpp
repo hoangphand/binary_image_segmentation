@@ -109,8 +109,9 @@ vector<int> find_augmenting_path_in_network(vector<MyNode> network, int s, int t
     queue_of_vertices.push_back(s);
 
     int count = 0;
+    bool time_to_stop = false;
 
-    while (queue_of_vertices.size() != 0) {
+    while (queue_of_vertices.size() != 0 && !time_to_stop) {
         int current_vertex = queue_of_vertices.front();
         queue_of_vertices.pop_front();
 
@@ -131,6 +132,10 @@ vector<int> find_augmenting_path_in_network(vector<MyNode> network, int s, int t
                         struct_path[network[current_vertex].edges[i].to].predecessor = current_vertex;
                         struct_path[network[current_vertex].edges[i].to].color = BLACK;
                     }
+                }
+                if (network[current_vertex].edges[i].to == t) {
+                    time_to_stop = true;
+                    break;
                 }
             }
         }
@@ -181,6 +186,12 @@ int max_flow_FF(Mat &in_image, vector<MyNode> &network, int s, int t, vector< ve
             if (augmenting_amount > residual_capacity_of_edge) {
                 augmenting_amount = residual_capacity_of_edge;
             }
+        }
+        for (int i = path.size() - 1; i >= 0; i--) {
+            pixel[0] = 0;
+            pixel[1] = 0;
+            pixel[2] = 0;
+            in_image.at<Vec3b>(int(path[i] / 640), path[i] % 640) = pixel;
         }
         count++;
         // cout<<"count: "<<count<<endl;
@@ -629,7 +640,7 @@ int main( int argc, char** argv )
     cout<<max_flow_FF(out_image, network, network.size() - 2, network.size() - 1, tmp_mat)<<endl;
     vector<int> vertices_belong_to_source = find_min_cut(network, network.size() - 2);
     cout<<"size: "<<vertices_belong_to_source.size()<<endl;
-    // cout<<"count_same: "<<count_same<<endl;
+    // // cout<<"count_same: "<<count_same<<endl;
 
     for (int i = 0; i < network.size() - 2; i++) {
         int x = int(i / width);
@@ -651,8 +662,8 @@ int main( int argc, char** argv )
         out_image.at<Vec3b>(x, y) = pixel;
     }
     
-    // // write it on disk
-    imwrite( argv[3], out_image);
+    // // // write it on disk
+    // imwrite( argv[3], out_image);
     
     // also display them both
     
